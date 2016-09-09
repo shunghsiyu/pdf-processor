@@ -27,7 +27,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     all_pages = all_pages_in_directory(args.directory)
 
-    for idx, pages in enumerate(split_on_condition(all_pages, predicate=width_greater_than_height)):
+    for idx, pages in enumerate(split_on_condition(all_pages, predicate=width_greater_than_height), start=1):
         pdf_writer = PdfFileWriter()
         map(pdf_writer.addPage, pages)
 
