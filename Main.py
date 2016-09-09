@@ -1,5 +1,6 @@
 """Main Module of PDF Splitter"""
 import argparse
+import os
 
 from PyPDF2 import PdfFileWriter
 
@@ -35,5 +36,7 @@ if __name__ == '__main__':
         output_filename = '{0:05}.pdf'.format(idx)
         with open(output_filename, 'wb') as output_file:
             pdf_writer.write(output_file)
+            output_file.flush()
+            os.fsync(output_file.fileno())
 
     map(lambda f: f.close, opened_files)
