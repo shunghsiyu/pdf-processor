@@ -15,12 +15,11 @@ def all_pdf_files_in_directory(path):
     return [filename for filename in os.listdir(path) if pdf_file(filename)]
 
 
-def all_pages_in_directory(path):
-    """A generator that yields one PDF page a time for all the PDF in the directory."""
-    for filename in sorted(all_pdf_files_in_directory(path)):
-        with open(filename, 'rb') as input_file:
-            for page in PdfFileReader(input_file).pages:
-                yield page
+def concat_pdf_pages(files):
+    """A generator that yields one PDF page a time for all pages in the PDF files."""
+    for input_file in files:
+        for page in PdfFileReader(input_file).pages:
+            yield page
 
 
 def split_on_condition(iterable, predicate):
