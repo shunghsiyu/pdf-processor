@@ -3,8 +3,7 @@ import argparse
 
 from PyPDF2 import PdfFileWriter
 
-from Util import all_pages_in_directory, split_on_condition
-
+from Util import all_pdf_files_in_directory, split_on_condition, concat_pdf_pages
 
 parser = \
     argparse.ArgumentParser(
@@ -25,7 +24,9 @@ def width_greater_than_height(page):
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    all_pages = all_pages_in_directory(args.directory)
+    all_pdf_files = all_pdf_files_in_directory(args.directory)
+    opened_files = map(lambda path: open(path, 'rb'), all_pdf_files)
+    all_pages = concat_pdf_pages(opened_files)
 
     for idx, pages in enumerate(split_on_condition(all_pages, predicate=width_greater_than_height), start=1):
         pdf_writer = PdfFileWriter()
@@ -34,3 +35,5 @@ if __name__ == '__main__':
         output_filename = '{0:05}.pdf'.format(idx)
         with open(output_filename, 'wb') as output_file:
             pdf_writer.write(output_file)
+
+    map(lambda f: f.close, opened_files)
