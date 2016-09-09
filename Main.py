@@ -18,12 +18,7 @@ parser.add_argument(
 )
 
 
-def width_greater_than_height(page):
-    box = page.mediaBox
-    return box.getWidth() > box.getHeight()
-
-
-if __name__ == '__main__':
+def main():
     args = parser.parse_args()
     directory = args.directory
     all_pdf_files = [os.path.join(directory, filename) for filename in all_pdf_files_in_directory(directory)]
@@ -41,3 +36,12 @@ if __name__ == '__main__':
             os.fsync(output_file.fileno())
 
     map(lambda f: f.close, opened_files)
+
+
+def width_greater_than_height(page):
+    box = page.mediaBox
+    return box.getWidth() > box.getHeight()
+
+
+if __name__ == '__main__':
+    main()
