@@ -25,7 +25,8 @@ def width_greater_than_height(page):
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    all_pdf_files = all_pdf_files_in_directory(args.directory)
+    directory = args.directory
+    all_pdf_files = [os.path.join(directory, filename) for filename in all_pdf_files_in_directory(directory)]
     opened_files = map(lambda path: open(path, 'rb'), all_pdf_files)
     all_pages = concat_pdf_pages(opened_files)
 
