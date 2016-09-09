@@ -35,6 +35,10 @@ def main():
         pdf_writer = PdfFileWriter()
         map(pdf_writer.addPage, pages)
 
+        # If there is an odd number of pages, append a blank page to make the page number even
+        if len(pages) % 2 == 1:
+            pdf_writer.addBlankPage()
+
         # And write those pages to a single PDF file
         output_filename = '{0:05}.pdf'.format(idx)
         with open(output_filename, 'wb') as output_file:
