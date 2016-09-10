@@ -39,7 +39,8 @@ def main():
     for idx, pages in enumerate(split_on(all_pages, predicate=is_landscape), start=1):
         # Put those pages into a writer
         pdf_writer = PdfFileWriter()
-        map(pdf_writer.addPage, pages)
+        for page in pages:
+            pdf_writer.addPage(page)
 
         # Make sure the output PDF will have an even number of pages
         # which makes printing the PDF file easier
