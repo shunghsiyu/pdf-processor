@@ -52,5 +52,6 @@ def split_on_condition(iterable, predicate):
 
 
 def is_landscape(page):
+    """Check whether or not a page is in landscape orientation."""
     box = page.mediaBox
     return box.getWidth() > box.getHeight()
