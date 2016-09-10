@@ -22,7 +22,7 @@ def concat_pdf_pages(files):
             yield page
 
 
-def split_on_condition(iterable, predicate):
+def split_on(iterable, predicate):
     """Split a iterable into chunks, where the first item in the chunk will be the
     evaluate to True with predicate function, and the rest of the items in the chunk
     evaluates to False."""

@@ -4,7 +4,7 @@ import os
 
 from PyPDF2 import PdfFileWriter
 
-from Util import all_pdf_files_in_directory, split_on_condition, concat_pdf_pages, is_landscape
+from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, is_landscape
 
 parser = \
     argparse.ArgumentParser(
@@ -30,7 +30,7 @@ def main():
     all_pages = concat_pdf_pages(opened_files)
 
     # For all pages that belongs to the same document ID
-    for idx, pages in enumerate(split_on_condition(all_pages, predicate=is_landscape), start=1):
+    for idx, pages in enumerate(split_on(all_pages, predicate=is_landscape), start=1):
         # Put those pages into a writer
         pdf_writer = PdfFileWriter()
         map(pdf_writer.addPage, pages)
