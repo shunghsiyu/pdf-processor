@@ -51,6 +51,6 @@ def split_on_condition(iterable, predicate):
             break
 
 
-def width_greater_than_height(page):
+def is_landscape(page):
     box = page.mediaBox
     return box.getWidth() > box.getHeight()
