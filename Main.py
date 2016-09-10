@@ -25,7 +25,7 @@ def main():
 
     # Open the PDF files
     all_pdf_files = [os.path.join(directory, filename) for filename in all_pdf_files_in_directory(directory)]
-    opened_files = map(lambda path: open(path, 'rb'), all_pdf_files)
+    opened_files = [open(path, 'rb') for path in all_pdf_files]
 
     all_pages = concat_pdf_pages(opened_files)
 
@@ -49,7 +49,8 @@ def main():
             os.fsync(output_file.fileno())
 
     # Make sure to close all the files that were opened
-    map(lambda f: f.close, opened_files)
+    for file in opened_files:
+        file.close()
 
 
 if __name__ == '__main__':
