@@ -4,7 +4,7 @@ import os
 
 from PyPDF2 import PdfFileWriter
 
-from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, is_landscape
+from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, is_landscape, write_pdf_file
 
 parser = \
     argparse.ArgumentParser(
@@ -39,14 +39,9 @@ def main():
         if len(pages) % 2 == 1:
             pdf_writer.addBlankPage()
 
-        # And write those pages to a single PDF file
         output_filename = '{0:05}.pdf'.format(idx)
-        with open(output_filename, 'wb') as output_file:
-            pdf_writer.write(output_file)
-
-            # Extra measures to make sure data is written to disk
-            output_file.flush()
-            os.fsync(output_file.fileno())
+        # And write those pages to a single PDF file
+        write_pdf_file(output_filename, pdf_writer)
 
     # Make sure to close all the files that were opened
     for file in opened_files:

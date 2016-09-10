@@ -55,3 +55,13 @@ def is_landscape(page):
     """Check whether or not a page is in landscape orientation."""
     box = page.mediaBox
     return box.getWidth() > box.getHeight()
+
+
+def write_pdf_file(output_filename, pdf_writer):
+    """Helper function for writing all the pages in PDFWriter to a file on disk."""
+    with open(output_filename, 'wb') as output_file:
+        pdf_writer.write(output_file)
+
+        # Extra measures to make sure data is written to disk
+        output_file.flush()
+        os.fsync(output_file.fileno())
