@@ -29,15 +29,21 @@ def main():
 
     all_pages = concat_pdf_pages(opened_files)
 
+    def make_pagenum_even(pdf_writer):
+        """Helper function that append a blank page if the number of page is an odd number, in order to make the
+        page number even."""
+        if pdf_writer.getNumPages() % 2 == 1:
+            pdf_writer.addBlankPage()
+
     # For all pages that belongs to the same document ID
     for idx, pages in enumerate(split_on(all_pages, predicate=is_landscape), start=1):
         # Put those pages into a writer
         pdf_writer = PdfFileWriter()
         map(pdf_writer.addPage, pages)
 
-        # If there is an odd number of pages, append a blank page to make the page number even
-        if len(pages) % 2 == 1:
-            pdf_writer.addBlankPage()
+        # Make sure the output PDF will have an even number of pages
+        # which makes printing the PDF file easier
+        make_pagenum_even(pdf_writer)
 
         output_filename = '{0:05}.pdf'.format(idx)
         # And write those pages to a single PDF file
