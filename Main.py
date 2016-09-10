@@ -27,6 +27,7 @@ def main():
     all_pdf_files = [os.path.join(directory, filename) for filename in all_pdf_files_in_directory(directory)]
     opened_files = [open(path, 'rb') for path in all_pdf_files]
 
+    # Take all the pages in all the PDF files into a generator
     all_pages = concat_pdf_pages(opened_files)
 
     def make_pagenum_even(pdf_writer):
@@ -36,10 +37,12 @@ def main():
             pdf_writer.addBlankPage()
 
     # For all pages that belongs to the same document ID
-    for idx, pages in enumerate(split_on(all_pages, predicate=is_landscape), start=1):
-        # Put those pages into a writer
+    for idx, pages_to_write in enumerate(split_on(all_pages, predicate=is_landscape), start=1):
+        # Create a PDF writer instance
         pdf_writer = PdfFileWriter()
-        for page in pages:
+
+        # Put those pages into a writer
+        for page in pages_to_write:
             pdf_writer.addPage(page)
 
         # Make sure the output PDF will have an even number of pages
