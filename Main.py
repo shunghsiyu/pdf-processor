@@ -4,7 +4,7 @@ import os
 
 from PyPDF2 import PdfFileWriter
 
-from Util import all_pdf_files_in_directory, split_on_condition, concat_pdf_pages
+from Util import all_pdf_files_in_directory, split_on_condition, concat_pdf_pages, width_greater_than_height
 
 parser = \
     argparse.ArgumentParser(
@@ -50,11 +50,6 @@ def main():
 
     # Make sure to close all the files that were opened
     map(lambda f: f.close, opened_files)
-
-
-def width_greater_than_height(page):
-    box = page.mediaBox
-    return box.getWidth() > box.getHeight()
 
 
 if __name__ == '__main__':

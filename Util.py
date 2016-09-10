@@ -49,3 +49,8 @@ def split_on_condition(iterable, predicate):
             # If the end of the iterator is reached then simply return the current chunk
             yield chunk
             break
+
+
+def width_greater_than_height(page):
+    box = page.mediaBox
+    return box.getWidth() > box.getHeight()
