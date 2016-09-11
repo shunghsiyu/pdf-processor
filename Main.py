@@ -25,11 +25,13 @@ parser.add_argument(
     help='how to correct the rotation of the first PDF page'
 )
 parser.add_argument(
+    '-m',
     '--merge',
     action='store_true',
     help='merge all the output files into another PDF file'
 )
 parser.add_argument(
+    '-v',
     '--verbose',
     action='store_true',
     help='increase output verbosity'
