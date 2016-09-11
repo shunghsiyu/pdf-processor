@@ -35,6 +35,14 @@ parser.add_argument(
     help='merge all the output files into another PDF file'
 )
 parser.add_argument(
+    '-n',
+    '--no-blank-page',
+    dest='even_pages',
+    action='store_false',
+    default=True,
+    help='do not append blank page to make page number an even number'
+)
+parser.add_argument(
     '-v',
     '--verbose',
     action='store_true',
@@ -57,13 +65,13 @@ def main():
         log.parent.setLevel(logging.DEBUG)
 
     directory = args.directory
-    output_files = pdf_split(directory, rotation_correctors[args.rotate_back])
+    output_files = pdf_split(directory, rotation_correctors[args.rotate_back], args.even_pages)
 
     if args.merge:
         merge_output(output_files)
 
 
-def pdf_split(directory, correct_rotation):
+def pdf_split(directory, correct_rotation, even_pages):
     log.info('Working on PDF files in %s', directory)
 
     output_filenames = []
@@ -105,9 +113,9 @@ def pdf_split(directory, correct_rotation):
 
         # Put those pages into a writer
         add_pages(pdf_writer, pages_to_write)
-        # Make sure the output PDF will have an even number of pages
-        # which makes printing the PDF file easier
-        make_pagenum_even(pdf_writer)
+        # Conditionally make the output PDF file have an even number of pages, which makes printing the PDF file easier
+        if even_pages:
+            make_pagenum_even(pdf_writer)
 
         output_filename = '{0:05}.pdf'.format(idx)
         output_filenames.append(output_filename)
