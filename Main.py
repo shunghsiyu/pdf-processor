@@ -53,12 +53,12 @@ def pdf_split(directory):
     # Take all the pages in all the PDF files into a generator
     all_pages = concat_pdf_pages(opened_files)
 
-    def make_pagenum_even(pdf_writer):
+    def make_pagenum_even(writer):
         """Helper function that append a blank page if the number of page is an odd number, in order to make the
         page number even."""
-        if pdf_writer.getNumPages() % 2 == 1:
+        if writer.getNumPages() % 2 == 1:
             log.debug('    Adding a blank page')
-            pdf_writer.addBlankPage()
+            writer.addBlankPage()
 
     # For all pages that belongs to the same document ID
     for idx, pages_to_write in enumerate(split_on(all_pages, predicate=is_landscape), start=1):
@@ -83,8 +83,8 @@ def pdf_split(directory):
 
     # Make sure to close all the files that were opened
     log.debug('Closing all opened files')
-    for file in opened_files:
-        file.close()
+    for opened_file in opened_files:
+        opened_file.close()
 
     return output_filenames
 
