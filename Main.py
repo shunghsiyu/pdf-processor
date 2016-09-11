@@ -23,10 +23,15 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.INFO)
 
+
 def main():
     # Get to directory with PDF files to work on
     args = parser.parse_args()
     directory = args.directory
+    pdf_split(directory)
+
+
+def pdf_split(directory):
     log.info('Working on PDF files in %s', directory)
 
     # Open the PDF files
