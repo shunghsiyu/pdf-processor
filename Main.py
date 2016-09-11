@@ -18,6 +18,13 @@ parser.add_argument(
     help='path to a directory'
 )
 parser.add_argument(
+    '-r',
+    '--rotate-back',
+    choices=['ccw', 'cw', 'no-op'],
+    default='no-op',
+    help='how to correct the rotation of the first PDF page'
+)
+parser.add_argument(
     '--merge',
     action='store_true',
     help='merge all the output files into another PDF file'
@@ -33,6 +40,13 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.INFO)
 
+# A dictionary that contains function that corrects the rotation of a PDF page
+rotation_correctors = {
+    'cw': lambda page: page.rotateClockwise(90),
+    'ccw': lambda page: page.rotateCounterClockwise(90),
+    'no-op': lambda page: page  # Do nothing
+}
+
 
 def main():
     # Get to directory with PDF files to work on
@@ -42,13 +56,13 @@ def main():
         log.setLevel(logging.DEBUG)
 
     directory = args.directory
-    output_files = pdf_split(directory)
+    output_files = pdf_split(directory, rotation_correctors[args.rotate_back])
 
     if args.merge:
         merge_output(output_files)
 
 
-def pdf_split(directory):
+def pdf_split(directory, correct_rotation):
     log.info('Working on PDF files in %s', directory)
 
     output_filenames = []
@@ -72,6 +86,15 @@ def pdf_split(directory):
     for idx, pages_to_write in enumerate(split_on(all_pages, predicate=is_landscape), start=1):
         # Create a PDF writer instance
         pdf_writer = PdfFileWriter()
+
+        # Correct the rotation of the first page in file
+        first_page = pages_to_write[0]
+        # If this is the first page of the first PDF file, it might not be in landscape view
+        # so we check for that
+        if is_landscape(first_page):
+            log.debug('Correction rotation on the first page=%s', repr(first_page))
+            # Correct the rotation the way the user specifies
+            correct_rotation(first_page)
 
         # Put those pages into a writer
         log.info('Adding %d PDF pages to PDFWriter', len(pages_to_write))
