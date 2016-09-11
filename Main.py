@@ -57,7 +57,7 @@ def pdf_split(directory):
         """Helper function that append a blank page if the number of page is an odd number, in order to make the
         page number even."""
         if writer.getNumPages() % 2 == 1:
-            log.debug('    Adding a blank page')
+            log.info('    Adding a blank page')
             writer.addBlankPage()
 
     # For all pages that belongs to the same document ID
@@ -66,7 +66,7 @@ def pdf_split(directory):
         pdf_writer = PdfFileWriter()
 
         # Put those pages into a writer
-        log.info('Adding %d pages to PDFWriter', len(pages_to_write))
+        log.info('Adding %d PDF pages to PDFWriter', len(pages_to_write))
         for page in pages_to_write:
             log.debug('    Adding page %s', repr(page))
             pdf_writer.addPage(page)
