@@ -18,6 +18,11 @@ parser.add_argument(
     help='path to a directory'
 )
 parser.add_argument(
+    '--merge',
+    action='store_true',
+    help='merge all the output files into another PDF file'
+)
+parser.add_argument(
     '--verbose',
     action='store_true',
     help='increase output verbosity'
@@ -38,6 +43,9 @@ def main():
 
     directory = args.directory
     output_files = pdf_split(directory)
+
+    if args.merge:
+        merge_output(output_files)
 
 
 def pdf_split(directory):
@@ -87,6 +95,30 @@ def pdf_split(directory):
         opened_file.close()
 
     return output_filenames
+
+
+def merge_output(pdf_files, output_filename='all.pdf'):
+    """Merge all the output PDF files into a single PDF files to make printing easier.
+    The output filename defaults to 'all.pdf'."""
+    log.info('Merging output files\n    %s', '\n    '.join(pdf_files))
+
+    opened_files = [open(path, 'rb') for path in pdf_files]
+
+    pdf_writer = PdfFileWriter()
+    # Write all the pages in all the output PDF files into PDFWriter
+    for page in concat_pdf_pages(opened_files):
+        pdf_writer.addPage(page)
+    log.info('Added %d pages to PDFWriter', pdf_writer.getNumPages())
+
+    # And write those pages to a single PDF file
+    log.info('Writing PDF pages to %s', output_filename)
+    write_pdf_file(output_filename, pdf_writer)
+
+    # Make sure to close all the files that were opened
+    log.debug('Closing all opened files')
+    for opened_file in opened_files:
+        opened_file.close()
+
 
 if __name__ == '__main__':
     main()
