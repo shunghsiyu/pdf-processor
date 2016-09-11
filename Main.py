@@ -7,6 +7,10 @@ from PyPDF2 import PdfFileWriter
 
 from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, is_landscape, write_pdf_file
 
+# Get default logger
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
+
 parser = \
     argparse.ArgumentParser(
         description='Split all the pages of multiple PDF files in a directory by document number'
@@ -37,11 +41,6 @@ parser.add_argument(
     help='increase output verbosity'
 )
 
-# Get default logger
-log = logging.getLogger(__name__)
-log.addHandler(logging.StreamHandler())
-log.setLevel(logging.INFO)
-
 # A dictionary that contains function that corrects the rotation of a PDF page
 rotation_correctors = {
     'cw': lambda page: page.rotateClockwise(90),
@@ -55,7 +54,7 @@ def main():
     args = parser.parse_args()
 
     if args.verbose:
-        log.setLevel(logging.DEBUG)
+        log.parent.setLevel(logging.DEBUG)
 
     directory = args.directory
     output_files = pdf_split(directory, rotation_correctors[args.rotate_back])
@@ -147,3 +146,4 @@ def merge_output(pdf_files, output_filename='all.pdf'):
 
 if __name__ == '__main__':
     main()
+    logging.shutdown()
