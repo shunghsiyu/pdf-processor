@@ -37,11 +37,13 @@ def main():
         log.setLevel(logging.DEBUG)
 
     directory = args.directory
-    pdf_split(directory)
+    output_files = pdf_split(directory)
 
 
 def pdf_split(directory):
     log.info('Working on PDF files in %s', directory)
+
+    output_filenames = []
 
     # Open the PDF files
     all_pdf_files = [os.path.join(directory, filename) for filename in all_pdf_files_in_directory(directory)]
@@ -74,6 +76,7 @@ def pdf_split(directory):
         make_pagenum_even(pdf_writer)
 
         output_filename = '{0:05}.pdf'.format(idx)
+        output_filenames.append(output_filename)
         # And write those pages to a single PDF file
         log.info('Writing PDF pages to %s', output_filename)
         write_pdf_file(output_filename, pdf_writer)
@@ -83,6 +86,7 @@ def pdf_split(directory):
     for file in opened_files:
         file.close()
 
+    return output_filenames
 
 if __name__ == '__main__':
     main()
