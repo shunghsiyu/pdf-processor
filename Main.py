@@ -17,6 +17,11 @@ parser.add_argument(
     type=str,
     help='path to a directory'
 )
+parser.add_argument(
+    '--verbose',
+    action='store_true',
+    help='increase output verbosity'
+)
 
 # Get default logger
 log = logging.getLogger(__name__)
@@ -27,6 +32,10 @@ log.setLevel(logging.INFO)
 def main():
     # Get to directory with PDF files to work on
     args = parser.parse_args()
+
+    if args.verbose:
+        log.setLevel(logging.DEBUG)
+
     directory = args.directory
     pdf_split(directory)
 
