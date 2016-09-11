@@ -5,7 +5,7 @@ import os
 
 from PyPDF2 import PdfFileWriter
 
-from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, is_landscape, write_pdf_file
+from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, is_landscape, write_pdf_file, add_pages
 
 # Get default logger
 logging.basicConfig(level=logging.INFO)
@@ -98,11 +98,7 @@ def pdf_split(directory, correct_rotation):
             correct_rotation(first_page)
 
         # Put those pages into a writer
-        log.info('Adding %d PDF pages to PDFWriter', len(pages_to_write))
-        for page in pages_to_write:
-            log.debug('    Adding page %s', repr(page))
-            pdf_writer.addPage(page)
-
+        add_pages(pdf_writer, pages_to_write)
         # Make sure the output PDF will have an even number of pages
         # which makes printing the PDF file easier
         make_pagenum_even(pdf_writer)
@@ -130,9 +126,7 @@ def merge_output(pdf_files, output_filename='all.pdf'):
 
     pdf_writer = PdfFileWriter()
     # Write all the pages in all the output PDF files into PDFWriter
-    for page in concat_pdf_pages(opened_files):
-        pdf_writer.addPage(page)
-    log.info('Added %d pages to PDFWriter', pdf_writer.getNumPages())
+    add_pages(pdf_writer, concat_pdf_pages(opened_files))
 
     # And write those pages to a single PDF file
     log.info('Writing PDF pages to %s', output_filename)

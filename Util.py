@@ -1,8 +1,12 @@
 """Collection of Helper Functions"""
+import logging
 import os
 from fnmatch import fnmatch
 
 from PyPDF2 import PdfFileReader
+
+# Get default logger
+log = logging.getLogger(__name__)
 
 
 def pdf_file(filename):
@@ -65,3 +69,11 @@ def write_pdf_file(output_filename, pdf_writer):
         # Extra measures to make sure data is written to disk
         output_file.flush()
         os.fsync(output_file.fileno())
+
+
+def add_pages(pdf_writer, pages_to_write):
+    """Add the PDF pages in a iterable into the specified PDFWriter."""
+    for page in pages_to_write:
+        log.debug('    Adding page %s', repr(page))
+        pdf_writer.addPage(page)
+    log.info('Added %d pages to PDFWriter', pdf_writer.getNumPages())
