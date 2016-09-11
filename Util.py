@@ -12,7 +12,7 @@ def pdf_file(filename):
 
 def all_pdf_files_in_directory(path):
     """Return a list of of PDF files in a directory."""
-    return [filename for filename in os.listdir(path) if pdf_file(filename)]
+    return sorted([filename for filename in os.listdir(path) if pdf_file(filename)])
 
 
 def concat_pdf_pages(files):
