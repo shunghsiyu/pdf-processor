@@ -5,7 +5,8 @@ import os
 
 from PyPDF2 import PdfFileWriter
 
-from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, is_landscape, write_pdf_file, add_pages
+from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, merge_with_next, is_landscape, write_pdf_file, \
+    add_pages
 
 # Get default logger
 logging.basicConfig(level=logging.INFO)
@@ -35,6 +36,13 @@ parser.add_argument(
     help='merge all the output files into another PDF file'
 )
 parser.add_argument(
+    '-d',
+    '--double-sided',
+    action='store_true',
+    default=False,
+    help='the input PDF files are double sided scans'
+)
+parser.add_argument(
     '-n',
     '--no-blank-page',
     dest='even_pages',
@@ -56,6 +64,12 @@ rotation_correctors = {
     'no-op': lambda page: page  # Do nothing
 }
 
+# A dictionary that contains functions that merge PDF page chunks
+double_sided_merge_conditions = {
+    'only_one_page': lambda pages: len(pages) == 1,
+    'never': lambda pages: False,  # Never merge page
+}
+
 
 def main():
     # Get to directory with PDF files to work on
@@ -65,13 +79,19 @@ def main():
         log.parent.setLevel(logging.DEBUG)
 
     directory = args.directory
-    output_files = pdf_split(directory, rotation_correctors[args.rotate_back], args.even_pages)
+    merge_condition = 'only_one_page' if args.double_sided else 'never'
+    output_files = pdf_split(
+        directory,
+        rotation_correctors[args.rotate_back],
+        args.even_pages,
+        double_sided_merge_conditions[merge_condition]
+    )
 
     if args.merge:
         merge_output(output_files)
 
 
-def pdf_split(directory, correct_rotation, even_pages):
+def pdf_split(directory, correct_rotation, even_pages, merge_condition):
     log.info('Working on PDF files in %s', directory)
 
     output_filenames = []
@@ -98,7 +118,9 @@ def pdf_split(directory, correct_rotation, even_pages):
             # width & height.
 
     # For all pages that belongs to the same document ID
-    for idx, pages_to_write in enumerate(split_on(all_pages, predicate=is_landscape), start=1):
+    for idx, pages_to_write in enumerate(
+            merge_with_next(
+                split_on(all_pages, predicate=is_landscape), merge_condition), start=1):
         # Create a PDF writer instance
         pdf_writer = PdfFileWriter()
 
