@@ -26,6 +26,25 @@ def concat_pdf_pages(files):
             yield page
 
 
+def merge_with_next(iterable, predicate):
+    """Merge an item with the next in the iterable if the item evaluates to True with
+    the predicate function. Will merge at most once for an item."""
+    it = iter(iterable)
+
+    while True:
+        item = it.next()
+
+        if predicate(item):
+            try:
+                next_item = it.next()
+                item = item + next_item
+            except StopIteration:
+                yield item
+                break
+
+        yield item
+
+
 def split_on(iterable, predicate):
     """Split a iterable into chunks, where the first item in the chunk will be the
     evaluate to True with predicate function, and the rest of the items in the chunk
