@@ -127,3 +127,14 @@ def image_data_info(page):
             return {'width': width, 'height': height, 'size': num_bytes, 'density': density}
 
     return None
+
+
+def detect_blank_page(page, min_density):
+    """Return True if the specified PDF page's first image have a density (size/dimension) lower than the specified
+    threshold, as image with that property is considered to be a blank page."""
+    info = image_data_info(page)
+    if info['density'] < min_density:
+        log.debug('    Skipping page %s', repr(page))
+        log.debug('             because image density is %F, lower than threshold of %F', info['density'], min_density)
+        return False
+    return True
