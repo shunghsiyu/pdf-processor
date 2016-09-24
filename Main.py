@@ -5,8 +5,8 @@ import os
 
 from PyPDF2 import PdfFileWriter
 
-from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, merge_with_next, is_landscape, write_pdf_file, \
-    add_pages
+from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, merge_with_next, is_landscape, \
+    write_pdf_file, add_pages
 
 # Get default logger
 logging.basicConfig(level=logging.INFO)
