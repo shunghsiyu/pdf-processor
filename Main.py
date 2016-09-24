@@ -6,7 +6,7 @@ import os
 from PyPDF2 import PdfFileWriter
 
 from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, merge_with_next, is_landscape, \
-    write_pdf_file, add_pages
+    write_pdf_file, add_pages, make_pagenum_even
 
 # Get default logger
 logging.basicConfig(level=logging.INFO)
@@ -111,19 +111,6 @@ def pdf_split(directory, correct_rotation, even_pages, merge_config):
 
     # Take all the pages in all the PDF files into a generator
     all_pages = concat_pdf_pages(opened_files)
-
-    def make_pagenum_even(writer):
-        """Helper function that append a blank page if the number of page is an odd number, in order to make the
-        page number even."""
-        if writer.getNumPages() % 2 == 1:
-            log.info('    Adding a blank page')
-            writer.addBlankPage()
-            # TODO: Fix blank page orientation bug
-            # Problem: if the only page in this writer was originally in landscape orientation, a new blank page will
-            # be in landscape orientation too.
-            # But it should be rare that a writer has only one page in it, thus not a big problem.
-            # Solution: takes the rotation of the only page in the PDF writer into account, or have a predefined page
-            # width & height.
 
     # First split pages into chunks when a page in landscape orientation is detected
     page_chunks1 = split_on(all_pages, predicate=is_landscape)
