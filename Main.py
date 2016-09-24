@@ -12,6 +12,7 @@ from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, merge_w
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
+# TODO: Add GUI Interface
 parser = \
     argparse.ArgumentParser(
         description='Split all the pages of multiple PDF files in a directory by document number'
