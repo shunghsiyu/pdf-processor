@@ -46,9 +46,9 @@ parser.add_argument(
     '-e',
     '--even-pages',
     dest='even_pages',
-    action='store_false',
-    default=True,
-    help='do not append blank page to make page number an even number'
+    action='store_true',
+    default=False,
+    help='Append blank page to make page number an even number'
 )
 parser.add_argument(
     '-v',
