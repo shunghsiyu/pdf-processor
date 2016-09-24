@@ -2,11 +2,13 @@
 import argparse
 import logging
 import os
+from functools import partial
+from itertools import ifilter
 
 from PyPDF2 import PdfFileWriter
 
 from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, merge_with_next, is_landscape, \
-    write_pdf_file, add_pages, make_pagenum_even
+    write_pdf_file, add_pages, make_pagenum_even, detect_blank_page
 
 # Get default logger
 logging.basicConfig(level=logging.INFO)
@@ -42,6 +44,14 @@ parser.add_argument(
     action='store_true',
     default=False,
     help='the input PDF files are double sided scans'
+)
+parser.add_argument(
+    '-f',
+    '--filter-density',
+    dest='min_density',
+    type=float,
+    default=0.0,
+    help='Append blank page to make page number an even number'
 )
 parser.add_argument(
     '-e',
@@ -88,14 +98,15 @@ def main():
         directory,
         rotation_correctors[args.rotate_back],
         args.even_pages,
-        merge_configs[merge_config]
+        merge_configs[merge_config],
+        args.min_density
     )
 
     if args.merge:
         merge_output(output_files)
 
 
-def pdf_split(directory, correct_rotation, even_pages, merge_config):
+def pdf_split(directory, correct_rotation, even_pages, merge_config, min_image_data_density):
     """Split all the PDF files in a certain directory.
     Optionally correct the rotation of the header page, make page chunks have even number of pages and
     merge page chunks before writing to output files."""
@@ -133,7 +144,9 @@ def pdf_split(directory, correct_rotation, even_pages, merge_config):
             correct_rotation(first_page)
 
         # Put those pages into a writer
-        add_pages(pdf_writer, pages_to_write)
+        detect_blank_page_under_threshold = partial(detect_blank_page, min_density=min_image_data_density)
+        non_blank_pages_to_write = ifilter(detect_blank_page_under_threshold, pages_to_write)
+        add_pages(pdf_writer, non_blank_pages_to_write)
         # Conditionally make the output PDF file have an even number of pages, which makes printing the PDF file easier
         if even_pages:
             make_pagenum_even(pdf_writer)
