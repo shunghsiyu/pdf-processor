@@ -64,10 +64,13 @@ rotation_correctors = {
     'no-op': lambda page: page  # Do nothing
 }
 
-# A dictionary that contains functions that merge PDF page chunks
-double_sided_merge_conditions = {
-    'only_one_page': lambda pages: len(pages) == 1,
-    'never': lambda pages: False,  # Never merge page
+# A dictionary that contains tuple of two functions, the first detect whether a chunk needs to be merged
+# with the next chunk, the second function decides how chunks should be merged
+merge_configs = {
+    # Merge when there is only one page in the chunk (happens with double-side scan) and
+    # merge the two chunks leaving out only the back-side of the header page
+    'double_sided': (lambda pages: len(pages) == 1, lambda chunk1, chunk2: chunk1 + chunk2[1:]),
+    'single_sided': (lambda pages: False, None)  # Never merge page
 }
 
 
@@ -79,19 +82,23 @@ def main():
         log.parent.setLevel(logging.DEBUG)
 
     directory = args.directory
-    merge_condition = 'only_one_page' if args.double_sided else 'never'
+    merge_config = 'double_sided' if args.double_sided else 'single_sided'
     output_files = pdf_split(
         directory,
         rotation_correctors[args.rotate_back],
         args.even_pages,
-        double_sided_merge_conditions[merge_condition]
+        merge_configs[merge_config]
     )
 
     if args.merge:
         merge_output(output_files)
 
 
-def pdf_split(directory, correct_rotation, even_pages, merge_condition):
+def pdf_split(directory, correct_rotation, even_pages, merge_config):
+    """Split all the PDF files in a certain directory.
+    Optionally correct the rotation of the header page, make page chunks have even number of pages and
+    merge page chunks before writing to output files."""
+
     log.info('Working on PDF files in %s', directory)
 
     output_filenames = []
@@ -117,10 +124,14 @@ def pdf_split(directory, correct_rotation, even_pages, merge_condition):
             # Solution: takes the rotation of the only page in the PDF writer into account, or have a predefined page
             # width & height.
 
+    # First split pages into chunks when a page in landscape orientation is detected
+    page_chunks1 = split_on(all_pages, predicate=is_landscape)
+    # Next merge adjacent chunks that meets certain condition with a merger function
+    # this is used to handle situation where the scan is double sided
+    page_chunks2 = merge_with_next(page_chunks1, predicate=merge_config[0], merger=merge_config[1])
+
     # For all pages that belongs to the same document ID
-    for idx, pages_to_write in enumerate(
-            merge_with_next(
-                split_on(all_pages, predicate=is_landscape), merge_condition), start=1):
+    for idx, pages_to_write in enumerate(page_chunks2, start=1):
         # Create a PDF writer instance
         pdf_writer = PdfFileWriter()
 
