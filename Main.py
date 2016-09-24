@@ -43,8 +43,8 @@ parser.add_argument(
     help='the input PDF files are double sided scans'
 )
 parser.add_argument(
-    '-n',
-    '--no-blank-page',
+    '-e',
+    '--even-pages',
     dest='even_pages',
     action='store_false',
     default=True,
