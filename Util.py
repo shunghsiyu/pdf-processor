@@ -95,6 +95,7 @@ def add_pages(pdf_writer, pages_to_write):
     """Add the PDF pages in a iterable into the specified PDFWriter."""
     for page in pages_to_write:
         log.debug('    Adding page %s', repr(page))
+        log.debug('                Image: %s', image_data_info(page))
         pdf_writer.addPage(page)
     log.info('Added %d pages to PDFWriter', pdf_writer.getNumPages())
 
@@ -111,3 +112,18 @@ def make_pagenum_even(writer):
         # But it should be rare that a writer has only one page in it, thus not a big problem.
         # Solution: takes the rotation of the only page in the PDF writer into account, or have a predefined page
         # width &
+
+
+def image_data_info(page):
+    """Return the dimension and file size of the first image encountered in the specified PDF page."""
+    xObject = page['/Resources']['/XObject'].getObject()
+
+    for obj_key in xObject:
+        obj = xObject[obj_key]
+        if obj['/Subtype'] == '/Image':
+            width, height = (obj['/Width'], obj['/Height'])
+            num_bytes = len(obj._data)
+            density = num_bytes * 1.0 / (width * height)
+            return {'width': width, 'height': height, 'size': num_bytes, 'density': density}
+
+    return None
