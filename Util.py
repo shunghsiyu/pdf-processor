@@ -1,5 +1,6 @@
 """Collection of Helper Functions"""
 import logging
+import operator as op
 import os
 from fnmatch import fnmatch
 
@@ -26,7 +27,7 @@ def concat_pdf_pages(files):
             yield page
 
 
-def merge_with_next(iterable, predicate):
+def merge_with_next(iterable, predicate, merger=op.add):
     """Merge an item with the next in the iterable if the item evaluates to True with
     the predicate function. Will merge at most once for an item."""
     it = iter(iterable)
@@ -37,7 +38,7 @@ def merge_with_next(iterable, predicate):
         if predicate(item):
             try:
                 next_item = it.next()
-                item = item + next_item
+                item = merger(item, next_item)
             except StopIteration:
                 yield item
                 break
