@@ -5,6 +5,8 @@ import logging
 import tkFileDialog
 import tkMessageBox
 
+import Main
+
 log = logging.getLogger(__name__)
 
 store = {}
