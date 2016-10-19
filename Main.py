@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from functools import partial
-from itertools import ifilter
+from itertools import ifilter, ifilterfalse
 
 from PyPDF2 import PdfFileWriter
 
@@ -129,6 +129,7 @@ def pdf_split(directory, correct_rotation, even_pages, merge_config, min_image_d
     # this is used to handle situation where the scan is double sided
     page_chunks2 = merge_with_next(page_chunks1, predicate=merge_config[0], merger=merge_config[1])
 
+    ignored_pdf_writer = PdfFileWriter()
     # For all pages that belongs to the same document ID
     for idx, pages_to_write in enumerate(page_chunks2, start=1):
         # Create a PDF writer instance
@@ -147,6 +148,9 @@ def pdf_split(directory, correct_rotation, even_pages, merge_config, min_image_d
         detect_blank_page_under_threshold = partial(detect_blank_page, min_density=min_image_data_density)
         non_blank_pages_to_write = ifilter(detect_blank_page_under_threshold, pages_to_write)
         add_pages(pdf_writer, non_blank_pages_to_write)
+        blank_pages_to_ignore = ifilterfalse(detect_blank_page_under_threshold, pages_to_write)
+        add_pages(ignored_pdf_writer, blank_pages_to_ignore, to_log=False)
+
         # Conditionally make the output PDF file have an even number of pages, which makes printing the PDF file easier
         if even_pages:
             make_pagenum_even(pdf_writer)
@@ -156,6 +160,9 @@ def pdf_split(directory, correct_rotation, even_pages, merge_config, min_image_d
         # And write those pages to a single PDF file
         log.info('Writing PDF pages to %s', output_filename)
         write_pdf_file(output_filename, pdf_writer)
+
+    if ignored_pdf_writer.getNumPages() > 0:
+        write_pdf_file('ignored.pdf', ignored_pdf_writer)
 
     # Make sure to close all the files that were opened
     log.debug('Closing all opened files')
