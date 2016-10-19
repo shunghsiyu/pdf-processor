@@ -116,7 +116,10 @@ def make_pagenum_even(writer):
 
 def image_data_info(page):
     """Return the dimension and file size of the first image encountered in the specified PDF page."""
-    xObject = page['/Resources']['/XObject'].getObject()
+    try:
+        xObject = page['/Resources']['/XObject'].getObject()
+    except KeyError:
+        return None
 
     for obj_key in xObject:
         obj = xObject[obj_key]
@@ -126,14 +129,12 @@ def image_data_info(page):
             density = num_bytes * 1.0 / (width * height)
             return {'width': width, 'height': height, 'size': num_bytes, 'density': density}
 
-    return None
-
 
 def detect_blank_page(page, min_density):
     """Return True if the specified PDF page's first image have a density (size/dimension) lower than the specified
     threshold, as image with that property is considered to be a blank page."""
     info = image_data_info(page)
-    if info['density'] < min_density:
+    if info and info['density'] < min_density:
         log.debug('    Skipping page %s', repr(page))
         log.debug('             because image density is %F, lower than threshold of %F', info['density'], min_density)
         return False
