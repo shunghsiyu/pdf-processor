@@ -2,6 +2,7 @@
 import argparse
 import logging
 import os
+import sys
 from functools import partial
 from itertools import ifilter
 
@@ -85,9 +86,9 @@ merge_configs = {
 }
 
 
-def main():
+def main(argv=sys.argv[1:]):
     # Get to directory with PDF files to work on
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.verbose:
         log.parent.setLevel(logging.DEBUG)
