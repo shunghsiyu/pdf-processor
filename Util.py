@@ -91,13 +91,16 @@ def write_pdf_file(output_filename, pdf_writer):
         os.fsync(output_file.fileno())
 
 
-def add_pages(pdf_writer, pages_to_write):
+def add_pages(pdf_writer, pages_to_write, to_log=True):
     """Add the PDF pages in a iterable into the specified PDFWriter."""
     for page in pages_to_write:
-        log.debug('    Adding page %s', repr(page))
-        log.debug('                Image: %s', image_data_info(page))
+        if to_log:
+            log.debug('    Adding page %s', repr(page))
+            log.debug('                Image: %s', image_data_info(page))
         pdf_writer.addPage(page)
-    log.info('Added %d pages to PDFWriter', pdf_writer.getNumPages())
+
+    if to_log:
+        log.info('Added %d pages to PDFWriter', pdf_writer.getNumPages())
 
 
 def make_pagenum_even(writer):
