@@ -12,7 +12,6 @@ from Util import all_pdf_files_in_directory, split_on, concat_pdf_pages, merge_w
     write_pdf_file, add_pages, make_pagenum_even, detect_blank_page
 
 # Get default logger
-logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 # TODO: Add GUI Interface
@@ -188,5 +187,6 @@ def merge_output(pdf_files, output_filename='all.pdf'):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     main()
     logging.shutdown()
